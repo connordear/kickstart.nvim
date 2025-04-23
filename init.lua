@@ -114,26 +114,8 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
-_G.colemak_keymaps_enabled = false
-
-local function set_colemak_keymaps()
-  if not _G.colemak_keymaps_enabled then
-    return
-  end
-  local opts = { silent = true }
-
-  vim.keymap.set({ 'n', 'v' }, 'h', 'm', opts)
-  vim.keymap.set({ 'n', 'v' }, 'j', 'n', opts)
-  vim.keymap.set({ 'n', 'v' }, 'h', 'e', opts)
-  vim.keymap.set({ 'n', 'v' }, 'l', 'i', opts)
-  vim.keymap.set({ 'n', 'v' }, 'm', 'h', opts)
-  vim.keymap.set({ 'n', 'v' }, 'n', 'j', opts)
-  vim.keymap.set({ 'n', 'v' }, 'e', 'k', opts)
-  vim.keymap.set({ 'n', 'v' }, 'i', 'l', opts)
-  vim.keymap.set({ 'n' }, 's', '')
-  _G.colemak_keymaps_enabled = true
-  vim.notify('Colemak keymaps ENABLED', vim.log.levels.INFO, { fg = '#8888FF' }) -- Blue-ish notify
-end
+-- Colemak Keymap Remap (navigation)
+_G.colemak_keymaps_enabled = true
 
 local function clear_colemak_keymaps()
   pcall(vim.keymap.del, 'n', 'h')
@@ -157,16 +139,34 @@ local function clear_colemak_keymaps()
   vim.notify('Colemak keymaps DISABLED', vim.log.levels.WARN)
 end
 
-vim.api.nvim_create_user_command('ToggleColemakKeymaps', function()
+local function set_colemak_keymaps()
+  local opts = { silent = true }
+
+  vim.keymap.set({ 'n', 'v' }, 'h', 'm', opts)
+  vim.keymap.set({ 'n', 'v' }, 'j', 'n', opts)
+  vim.keymap.set({ 'n', 'v' }, 'h', 'e', opts)
+  vim.keymap.set({ 'n', 'v' }, 'l', 'i', opts)
+  vim.keymap.set({ 'n', 'v' }, 'm', 'h', opts)
+  vim.keymap.set({ 'n', 'v' }, 'n', 'j', opts)
+  vim.keymap.set({ 'n', 'v' }, 'e', 'k', opts)
+  vim.keymap.set({ 'n', 'v' }, 'i', 'l', opts)
+  vim.keymap.set({ 'n' }, 's', '', opts)
+  _G.colemak_keymaps_enabled = true
+  vim.notify('Colemak keymaps ENABLED', vim.log.levels.INFO, { fg = '#8888FF' }) -- Blue-ish notify
+end
+
+local function toggle_colemak_keymaps()
   if _G.colemak_keymaps_enabled then
     clear_colemak_keymaps()
   else
-    _G.colemak_keymaps_enabled = true
     set_colemak_keymaps()
   end
-end, {
+end
+vim.api.nvim_create_user_command('ToggleColemakKeymaps', toggle_colemak_keymaps, {
   desc = 'Enable/Disable Colemak-DH specific keybindings',
 })
+
+vim.keymap.set('n', '`', toggle_colemak_keymaps)
 
 vim.keymap.set('n', '-', function()
   local buf_name = vim.api.nvim_buf_get_name(0)
@@ -990,8 +990,9 @@ require('lazy').setup({
   },
 })
 
-require 'autocmds'
 set_colemak_keymaps()
+
+require 'autocmds'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
