@@ -75,6 +75,10 @@ vim.opt.scrolloff = 10
 -- See `:help 'confirm'`
 vim.opt.confirm = true
 
+vim.opt.spell = true
+vim.opt.spelllang = 'en_ca'
+vim.opt.mousemodel = 'popup'
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -140,7 +144,7 @@ local function clear_colemak_keymaps()
 end
 
 local function set_colemak_keymaps()
-  local opts = { silent = true }
+  local opts = { silent = true, noremap = false }
 
   vim.keymap.set({ 'n', 'v' }, 'h', 'm', opts)
   vim.keymap.set({ 'n', 'v' }, 'j', 'n', opts)
@@ -162,6 +166,7 @@ local function toggle_colemak_keymaps()
     set_colemak_keymaps()
   end
 end
+
 vim.api.nvim_create_user_command('ToggleColemakKeymaps', toggle_colemak_keymaps, {
   desc = 'Enable/Disable Colemak-DH specific keybindings',
 })
@@ -187,6 +192,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
+vim.keymap.set('n', 'gh', vim.lsp.buf.hover)
+vim.keymap.set('n', 'ghd', vim.diagnostic.open_float)
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
