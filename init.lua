@@ -5,7 +5,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -139,12 +139,30 @@ local function clear_colemak_keymaps()
   pcall(vim.keymap.del, 'v', 'e')
   pcall(vim.keymap.del, 'v', 'i')
   pcall(vim.keymap.del, 'n', 's')
+
+  pcall(vim.keymap.del, 'n', '<C-m>')
+  pcall(vim.keymap.del, 'n', '<C-n>')
+  pcall(vim.keymap.del, 'n', '<C-e>')
+  pcall(vim.keymap.del, 'n', '<C-i>')
+  vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+  vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+  vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+  vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
   _G.colemak_keymaps_enabled = false
   vim.notify('Colemak keymaps DISABLED', vim.log.levels.WARN)
 end
 
 local function set_colemak_keymaps()
   local opts = { silent = true, noremap = false }
+
+  pcall(vim.keymap.del, 'n', '<C-h>')
+  pcall(vim.keymap.del, 'n', '<C-j>')
+  pcall(vim.keymap.del, 'n', '<C-k>')
+  pcall(vim.keymap.del, 'n', '<C-l>')
+  vim.keymap.set('n', '<C-m>', '<C-w><C-h>', opts)
+  vim.keymap.set('n', '<C-n>', '<C-w><C-j>', opts)
+  vim.keymap.set('n', '<C-e>', '<C-w><C-k>', opts)
+  vim.keymap.set('n', '<C-i>', '<C-w><C-l>', opts)
 
   vim.keymap.set({ 'n', 'v' }, 'h', 'm', opts)
   vim.keymap.set({ 'n', 'v' }, 'j', 'n', opts)
@@ -155,6 +173,7 @@ local function set_colemak_keymaps()
   vim.keymap.set({ 'n', 'v' }, 'e', 'k', opts)
   vim.keymap.set({ 'n', 'v' }, 'i', 'l', opts)
   vim.keymap.set({ 'n' }, 's', '', opts)
+
   _G.colemak_keymaps_enabled = true
   vim.notify('Colemak keymaps ENABLED', vim.log.levels.INFO, { fg = '#8888FF' }) -- Blue-ish notify
 end
@@ -173,12 +192,12 @@ vim.api.nvim_create_user_command('ToggleColemakKeymaps', toggle_colemak_keymaps,
 
 vim.keymap.set('n', '`', toggle_colemak_keymaps)
 
-vim.keymap.set('n', '-', function()
-  local buf_name = vim.api.nvim_buf_get_name(0)
-  local path = vim.fn.filereadable(buf_name) == 1 and buf_name or vim.fn.getcwd()
-  MiniFiles.open(path)
-  MiniFiles.reveal_cwd()
-end, { desc = 'Open Mini Files' })
+-- vim.keymap.set('n', '-', function()
+--   local buf_name = vim.api.nvim_buf_get_name(0)
+--   local path = vim.fn.filereadable(buf_name) == 1 and buf_name or vim.fn.getcwd()
+--   MiniFiles.open(path)
+--   MiniFiles.reveal_cwd()
+-- end, { desc = 'Open Mini Files' })
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -245,6 +264,39 @@ require('lazy').setup({
   -- options to `gitsigns.nvim`.
   --
   -- See `:help gitsigns` to understand what the configuration keys do
+  {
+    'windwp/nvim-ts-autotag',
+    -- Optional: Specify event or ft to defer loading,
+    -- but for autotagging, you might want it active for relevant filetypes.
+    -- event = "VeryLazy", -- Or "BufReadPre", "BufNewFile"
+    ft = {
+      'html',
+      'javascriptreact',
+      'typescriptreact',
+      'svelte',
+      'vue',
+      'rescript',
+      'xml',
+      'php',
+      'markdown',
+      'astro',
+      'glimmer',
+      'handlebars',
+      'hbs',
+      'gotexttmpl',
+    }, -- Configure for filetypes you use
+    config = function()
+      require('nvim-ts-autotag').setup {
+        -- You can add specific configuration options here if needed
+        -- Check the plugin's documentation for available options.
+        -- Default options are usually sensible.
+        -- Example:
+        -- enable_close = true,  -- Enable closing tag
+        -- enable_rename = true, -- Enable renaming tag
+        -- enable_jump = true,   -- Enable jumping to closing tag
+      }
+    end,
+  },
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -271,7 +323,6 @@ require('lazy').setup({
   --
   -- Then, because we use the `opts` key (recommended), the configuration runs
   -- after the plugin has been loaded as `require(MODULE).setup(opts)`.
-
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -646,7 +697,10 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
+        gopls = {},
+        html = {},
+        htmx = {},
+        sqlls = {},
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -687,6 +741,8 @@ require('lazy').setup({
       --
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
+      require('lspconfig').htmx.setup {}
+
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
@@ -903,7 +959,7 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      require('mini.files').setup()
+      -- require('mini.files').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -930,8 +986,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
-      -- Autoinstall languages that are not installed
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'sql' }, -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
         enable = true,
@@ -962,15 +1017,15 @@ require('lazy').setup({
   require 'kickstart.plugins.debug',
   require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
-  require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
