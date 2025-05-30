@@ -264,39 +264,6 @@ require('lazy').setup({
   -- options to `gitsigns.nvim`.
   --
   -- See `:help gitsigns` to understand what the configuration keys do
-  {
-    'windwp/nvim-ts-autotag',
-    -- Optional: Specify event or ft to defer loading,
-    -- but for autotagging, you might want it active for relevant filetypes.
-    -- event = "VeryLazy", -- Or "BufReadPre", "BufNewFile"
-    ft = {
-      'html',
-      'javascriptreact',
-      'typescriptreact',
-      'svelte',
-      'vue',
-      'rescript',
-      'xml',
-      'php',
-      'markdown',
-      'astro',
-      'glimmer',
-      'handlebars',
-      'hbs',
-      'gotexttmpl',
-    }, -- Configure for filetypes you use
-    config = function()
-      require('nvim-ts-autotag').setup {
-        -- You can add specific configuration options here if needed
-        -- Check the plugin's documentation for available options.
-        -- Default options are usually sensible.
-        -- Example:
-        -- enable_close = true,  -- Enable closing tag
-        -- enable_rename = true, -- Enable renaming tag
-        -- enable_jump = true,   -- Enable jumping to closing tag
-      }
-    end,
-  },
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -982,11 +949,18 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    dependencies = {
+      { 'windwp/nvim-ts-autotag', opts = {
+        aliases = {
+          ['gotmpl'] = 'html',
+        },
+      } },
+    },
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'sql' }, -- Autoinstall languages that are not installed
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'sql', 'go', 'gotmpl' }, -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
         enable = true,

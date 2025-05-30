@@ -52,3 +52,11 @@ vim.api.nvim_create_autocmd('FileType', {
     end, opts)
   end, -- end callback
 }) -- end autocmd
+
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  pattern = '*.tmpl',
+  callback = function()
+    vim.bo.filetype = 'gotmpl'
+  end,
+  desc = 'Set filetype for Go HTML templates',
+})
