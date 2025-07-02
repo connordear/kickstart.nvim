@@ -1019,6 +1019,8 @@ require('lazy').setup({
         'go',
         'gotmpl',
         'templ',
+        'tsx',
+        'css',
       }, -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
