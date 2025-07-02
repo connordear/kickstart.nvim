@@ -665,9 +665,47 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         gopls = {},
-        html = {},
-        htmx = {},
+        html = {
+          filetypes = {
+            'html',
+          },
+        },
+        -- htmx = {
+        --   filetypes = {
+        --     'html',
+        --     'templ',
+        --     'gohtml',
+        --     'astro',
+        --   },
+        --   init_options = {
+        --     ['htmx-lsp'] = {
+        --       customTags = false,
+        --       languageServers = {
+        --         ['templ'] = true,
+        --         ['tailwindcss-lsp'] = true,
+        --       },
+        --     },
+        --   },
+        -- },
         sqlls = {},
+        templ = {},
+        tailwindcss = {
+          filetypes = {
+            'templ',
+            'astro',
+            'javascript',
+            'typescript',
+            'react',
+          },
+          settings = {
+            tailwindCSS = {
+              includeLanguages = {
+                templ = 'html',
+              },
+            },
+          },
+        },
+
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -708,7 +746,6 @@ require('lazy').setup({
       --
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
-      require('lspconfig').htmx.setup {}
 
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
@@ -950,17 +987,39 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
-      { 'windwp/nvim-ts-autotag', opts = {
-        aliases = {
-          ['gotmpl'] = 'html',
+      {
+        'windwp/nvim-ts-autotag',
+        opts = {
+          aliases = {
+            ['gotmpl'] = 'html',
+          },
         },
-      } },
+      },
+      {
+        'vrischmann/tree-sitter-templ',
+      },
     },
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'sql', 'go', 'gotmpl' }, -- Autoinstall languages that are not installed
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'sql',
+        'go',
+        'gotmpl',
+        'templ',
+      }, -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
         enable = true,
